@@ -1,0 +1,265 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    overflow: hidden;
+    color: white;
+}
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* شاشة البداية */
+#start-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 3rem;
+    border-radius: 20px;
+    border: 2px solid #ff4655;
+    min-width: 500px;
+    backdrop-filter: blur(10px);
+}
+
+#start-screen h1 {
+    color: #ff4655;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(255, 70, 85, 0.5);
+}
+
+#start-screen p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #e0e0e0;
+}
+
+#start-btn, #restart-btn {
+    background: linear-gradient(45deg, #ff4655, #ff6b81);
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 20px 0;
+    transition: all 0.3s;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+#start-btn:hover, #restart-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 70, 85, 0.7);
+}
+
+.controls {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-align: left;
+}
+
+.controls h3 {
+    color: #4dccff;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.controls p {
+    margin: 8px 0;
+    color: #ccc;
+}
+
+/* واجهة اللعبة */
+#game-ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#health-bar {
+    width: 300px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    border: 3px solid #333;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+#health-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #ff0000, #00ff00);
+    transition: width 0.3s;
+    border-radius: 17px;
+}
+
+#health-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+}
+
+#ammo-counter, #weapon-info, #players-left, #kill-counter, #safe-zone {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin: 10px 0;
+    display: inline-block;
+    font-weight: bold;
+    border: 2px solid #444;
+    font-size: 1.1rem;
+}
+
+#ammo-counter { color: #ffcc00; }
+#weapon-info { color: #4dccff; }
+#players-left { color: #ff4655; }
+#kill-counter { color: #ff6666; }
+#safe-zone { color: #00ff88; }
+
+#loot-notification {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 100, 0, 0.8);
+    padding: 15px 30px;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border: 2px solid gold;
+}
+
+/* شاشة النهاية */
+#end-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 4rem;
+    border-radius: 20px;
+    min-width: 600px;
+    border: 3px solid;
+}
+
+#end-screen.win {
+    border-color: gold;
+    background: linear-gradient(135deg, rgba(0, 100, 0, 0.9), rgba(0, 0, 0, 0.9));
+}
+
+#end-screen.lose {
+    border-color: #ff0000;
+    background: linear-gradient(135deg, rgba(100, 0, 0, 0.9), rgba(0, 0, 0, 0.9));
+}
+
+#result-title {
+    font-size: 3.5rem;
+    margin-bottom: 30px;
+}
+
+#result-stats {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    color: #ccc;
+}
+
+/* شاشة التحميل */
+#loading-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+
+.loader {
+    border: 8px solid #333;
+    border-top: 8px solid #ff4655;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 30px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* الكانفاس */
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* تأثيرات الضرر */
+.damage-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+}
+
+/* تلميح الغنائم */
+.loot-hint {
+    position: absolute;
+    background: rgba(255, 215, 0, 0.9);
+    color: black;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    pointer-events: none;
+    animation: float 2s infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-10px); }
+}
