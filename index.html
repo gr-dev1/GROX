@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معركة الجزيرة - لعبة بقاء</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.19.0/dist/cannon-es.js"></script>
+</head>
+<body>
+    <div id="game-container">
+        <!-- شاشة البداية -->
+        <div id="start-screen">
+            <h1>🔥 معركة الجزيرة 🔥</h1>
+            <p>أنت ضد 19 بوت. كن الأخير على قيد الحياة!</p>
+            <button id="start-btn">بدء المعركة</button>
+            <div class="controls">
+                <h3>🎮 التحكم:</h3>
+                <p><strong>W A S D</strong> - حركة</p>
+                <p><strong>ماوس</strong> - النظر/التصويب</p>
+                <p><strong>زر الماوس الأيسر</strong> - إطلاق النار</p>
+                <p><strong>E</strong> - جمع الغنائم</p>
+                <p><strong>R</strong> - إعادة تعبئة السلاح</p>
+                <p><strong>1-4</strong> - تغيير السلاح</p>
+                <p><strong>Shift</strong> - الجري</p>
+            </div>
+        </div>
+
+        <!-- واجهة اللعبة -->
+        <div id="game-ui" style="display: none;">
+            <div id="health-bar">
+                <div id="health-fill"></div>
+                <span id="health-text">100</span>
+            </div>
+            <div id="ammo-counter">رصاص: 30/90</div>
+            <div id="weapon-info">سلاح: M416</div>
+            <div id="players-left">الباقون: 20</div>
+            <div id="kill-counter">🩸 القتلى: 0</div>
+            <div id="safe-zone">⚪ المنطقة الآمنة</div>
+            
+            <!-- شريط الغنائم -->
+            <div id="loot-notification"></div>
+        </div>
+
+        <!-- شاشة النهاية -->
+        <div id="end-screen" style="display: none;">
+            <h1 id="result-title"></h1>
+            <p id="result-stats"></p>
+            <button id="restart-btn">لعب مرة أخرى</button>
+        </div>
+
+        <!-- عناصر اللعبة -->
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- شاشة التحميل -->
+        <div id="loading-screen">
+            <div class="loader"></div>
+            <p>جاري تحميل المعركة...</p>
+        </div>
+    </div>
+
+    <script src="weapons.js"></script>
+    <script src="bot-manager.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
