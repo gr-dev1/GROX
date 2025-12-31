@@ -2,153 +2,321 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1a1a2e">
-    <title>GROS - معركة البقاء</title>
-    
-    <!-- أيقونة التطبيق -->
-    <link rel="icon" type="image/png" href="assets/images/logo.png">
-    <link rel="apple-touch-icon" href="assets/images/logo.png">
-    
-    <!-- الخطوط -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- الأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- الأنيميشن -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    
-    <style>
-        /* التحميل الأولي السريع */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Cairo', sans-serif;
-            background: #000;
-            position: fixed;
-            touch-action: manipulation;
-        }
-        
-        #game-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-        
-        /* إخفاء الشاشات في البداية */
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-        }
-        
-        /* تأثير التحكم بالاتجاه */
-        @media screen and (orientation: portrait) {
-            .orientation-warning {
-                display: flex !important;
-            }
-        }
-        
-        @media screen and (orientation: landscape) {
-            .orientation-warning {
-                display: none !important;
-            }
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>One Royal - لعبة البقاء الجديدة</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- تحذير الاتجاه -->
-    <div id="orientation-warning" class="orientation-warning" style="display: none;">
-        <div class="warning-content">
-            <i class="fas fa-mobile-alt fa-4x"></i>
-            <h2>الرجاء تدوير الهاتف</h2>
-            <p>اللعبة تعمل في وضع أفقي فقط</p>
-            <div class="phone-rotate"></div>
+    <!-- شاشة التحميل -->
+    <div id="loadingScreen" class="screen">
+        <div class="loading-container">
+            <div class="logo">
+                <h1><span class="logo-accent">ONE</span> ROYAL</h1>
+                <p>لعبة البقاء من نوع جديد</p>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div class="loading-text">جاري تحميل اللعبة...</div>
         </div>
     </div>
-    
-    <div id="game-container">
-        <!-- شاشة التحميل -->
-        <div id="loading-screen" class="screen active">
-            <!-- سيتم إنشاؤها بالكامل بالجافاسكريبت -->
+
+    <!-- شاشة القائمة الرئيسية -->
+    <div id="mainMenu" class="screen hidden">
+        <div class="menu-container">
+            <div class="logo">
+                <h1><span class="logo-accent">ONE</span> ROYAL</h1>
+                <p>20 لاعب | 19 بوت | خريطة 4x4</p>
+            </div>
+            
+            <div class="menu-buttons">
+                <button id="playButton" class="menu-btn play-btn">
+                    <i class="fas fa-play"></i> بدء اللعبة
+                </button>
+                <button id="customizeButton" class="menu-btn">
+                    <i class="fas fa-user"></i> تخصيص الشخصية
+                </button>
+                <button id="settingsButton" class="menu-btn">
+                    <i class="fas fa-cog"></i> الإعدادات
+                </button>
+                <button id="shopButton" class="menu-btn">
+                    <i class="fas fa-shopping-cart"></i> المتجر
+                </button>
+                <button id="leaderboardButton" class="menu-btn">
+                    <i class="fas fa-trophy"></i> المتصدرين
+                </button>
+            </div>
+            
+            <div class="player-stats">
+                <div class="stat">
+                    <span class="stat-label">المستوى</span>
+                    <span class="stat-value">15</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">النقاط</span>
+                    <span class="stat-value">2,450</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">الانتصارات</span>
+                    <span class="stat-value">12</span>
+                </div>
+            </div>
         </div>
-        
-        <!-- شاشة اللوبي -->
-        <div id="lobby-screen" class="screen"></div>
-        
-        <!-- شاشة اللعبة -->
-        <div id="game-screen" class="screen">
-            <canvas id="game-canvas"></canvas>
-        </div>
-        
-        <!-- شاشة النتائج -->
-        <div id="results-screen" class="screen"></div>
     </div>
-    
-    <!-- المكتبات -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.19.0/dist/cannon-es.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
-    
-    <!-- ملفات المشروع -->
-    <script src="utils/device.js"></script>
-    <script src="utils/loader.js"></script>
-    <script src="screens/loading-screen.js"></script>
-    <script src="screens/lobby-screen.js"></script>
+
+    <!-- شاشة البحث عن مباراة -->
+    <div id="matchmakingScreen" class="screen hidden">
+        <div class="matchmaking-container">
+            <div class="logo small">
+                <h2><span class="logo-accent">ONE</span> ROYAL</h2>
+            </div>
+            
+            <div class="matchmaking-content">
+                <div class="searching-animation">
+                    <div class="searching-dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <h3>جاري البحث عن مباراة</h3>
+                    <p>يجمع اللاعبين والبيوت...</p>
+                </div>
+                
+                <div class="players-found">
+                    <div class="player-count">
+                        <span class="count">1</span>
+                        <span class="label">/ 20 لاعب</span>
+                    </div>
+                    <div class="player-list">
+                        <div class="player-item you">
+                            <i class="fas fa-user"></i>
+                            <span>أنت</span>
+                        </div>
+                        <!-- سيتم إضافة اللاعبين الآخرين عبر JavaScript -->
+                    </div>
+                </div>
+                
+                <button id="cancelMatchmaking" class="cancel-btn">
+                    <i class="fas fa-times"></i> إلغاء البحث
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة اللعبة -->
+    <div id="gameScreen" class="screen hidden">
+        <!-- عناصر واجهة اللعبة -->
+        <div class="game-hud">
+            <!-- معلومات اللاعب -->
+            <div class="player-info">
+                <div class="health-bar">
+                    <div class="health-fill" style="width: 100%"></div>
+                    <span class="health-text">100</span>
+                </div>
+                <div class="armor-bar">
+                    <div class="armor-fill" style="width: 75%"></div>
+                    <span class="armor-text">75</span>
+                </div>
+                <div class="ammo-count">
+                    <i class="fas fa-bullseye"></i>
+                    <span>30 / 90</span>
+                </div>
+            </div>
+            
+            <!-- معلومات الخريطة واللاعبين -->
+            <div class="game-info">
+                <div class="map-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>المنطقة الآمنة: 2x2</span>
+                </div>
+                <div class="players-left">
+                    <i class="fas fa-users"></i>
+                    <span>لاعبين باقيين: <span id="playersRemaining">20</span></span>
+                </div>
+                <div class="timer">
+                    <i class="fas fa-clock"></i>
+                    <span>04:32</span>
+                </div>
+            </div>
+            
+            <!-- معلومات الأسلحة -->
+            <div class="weapon-info">
+                <div class="weapon-slot active">
+                    <i class="fas fa-gun"></i>
+                    <span>AK-47</span>
+                </div>
+                <div class="weapon-slot">
+                    <i class="fas fa-gun"></i>
+                    <span>Pistol</span>
+                </div>
+                <div class="weapon-slot">
+                    <i class="fas fa-first-aid"></i>
+                    <span>علبة إسعاف</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- عناصر تحكم اللمس -->
+        <div class="touch-controls">
+            <!-- جويستيك للحركة -->
+            <div class="joystick-area" id="movementJoystick">
+                <div class="joystick-base"></div>
+                <div class="joystick-handle"></div>
+            </div>
+            
+            <!-- أزرار التحكم -->
+            <div class="action-buttons">
+                <button class="action-btn jump-btn" id="jumpBtn">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <button class="action-btn crouch-btn" id="crouchBtn">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+                <button class="action-btn reload-btn" id="reloadBtn">
+                    <i class="fas fa-redo"></i>
+                </button>
+                <button class="action-btn shoot-btn" id="shootBtn">
+                    <i class="fas fa-crosshairs"></i>
+                </button>
+                <button class="action-btn inventory-btn" id="inventoryBtn">
+                    <i class="fas fa-briefcase"></i>
+                </button>
+            </div>
+            
+            <!-- جويستيك للكاميرا -->
+            <div class="camera-joystick-area" id="cameraJoystick">
+                <div class="joystick-base"></div>
+                <div class="joystick-handle"></div>
+            </div>
+        </div>
+        
+        <!-- قائمة الجرد -->
+        <div id="inventoryMenu" class="inventory hidden">
+            <div class="inventory-header">
+                <h3>الجرد</h3>
+                <button class="close-inventory" id="closeInventory">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="inventory-items">
+                <!-- سيتم ملئها عبر JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة النتائج -->
+    <div id="resultsScreen" class="screen hidden">
+        <div class="results-container">
+            <div class="results-header">
+                <h2 id="resultTitle">#1 VICTORY ROYALE!</h2>
+                <p class="result-subtitle">لقد فزت في المباراة!</p>
+            </div>
+            
+            <div class="results-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-skull-crossbones"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-value" id="killsStat">5</span>
+                        <span class="stat-label">عدد القتلى</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-value" id="damageStat">1,240</span>
+                        <span class="stat-label">الضرر الكلي</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-value" id="timeStat">08:42</span>
+                        <span class="stat-label">مدة البقاء</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-value" id="xpStat">+450</span>
+                        <span class="stat-label">نقاط الخبرة</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-buttons">
+                <button id="playAgainButton" class="results-btn play-again-btn">
+                    <i class="fas fa-redo"></i> لعب مرة أخرى
+                </button>
+                <button id="mainMenuButton" class="results-btn menu-btn">
+                    <i class="fas fa-home"></i> القائمة الرئيسية
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- إعدادات اللعبة -->
+    <div id="settingsMenu" class="settings hidden">
+        <div class="settings-header">
+            <h3><i class="fas fa-cog"></i> إعدادات اللعبة</h3>
+            <button class="close-settings" id="closeSettings">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="settings-content">
+            <div class="setting-item">
+                <label for="soundVolume">مستوى الصوت</label>
+                <input type="range" id="soundVolume" min="0" max="100" value="70">
+                <span class="volume-value">70%</span>
+            </div>
+            <div class="setting-item">
+                <label for="sensitivity">حساسية التحكم</label>
+                <input type="range" id="sensitivity" min="1" max="10" value="5">
+                <span class="sensitivity-value">5</span>
+            </div>
+            <div class="setting-item">
+                <label for="graphicsQuality">جودة الرسومات</label>
+                <select id="graphicsQuality">
+                    <option value="low">منخفضة</option>
+                    <option value="medium" selected>متوسطة</option>
+                    <option value="high">عالية</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label for="controlLayout">تخطيط التحكم</label>
+                <select id="controlLayout">
+                    <option value="default" selected>افتراضي</option>
+                    <option value="left-handed">لأعسر اليد</option>
+                    <option value="custom">مخصص</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <button id="saveSettings" class="save-btn">
+                    <i class="fas fa-save"></i> حفظ الإعدادات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- رسالة تنبيه -->
+    <div id="alertMessage" class="alert hidden">
+        <div class="alert-content">
+            <p id="alertText">هذه رسالة تنبيه</p>
+        </div>
+    </div>
+
+    <!-- عنصر canvas للعرض ثلاثي الأبعاد -->
+    <canvas id="gameCanvas"></canvas>
+
     <script src="game.js"></script>
-    
-    <script>
-        // بدء اللعبة بعد تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', () => {
-            // كشف الجهاز
-            const device = detectDevice();
-            
-            // التحقق من الاتجاه
-            checkOrientation();
-            window.addEventListener('orientationchange', checkOrientation);
-            window.addEventListener('resize', checkOrientation);
-            
-            // بدء شاشة التحميل
-            if (device.isMobile) {
-                initLoadingScreen();
-            } else {
-                alert('اللعبة مصممة للهاتف. الرجاء الفتح على جهاز محمول.');
-                // يمكن توجيه لصفحة بديلة
-            }
-        });
-        
-        // التحقق من الاتجاه
-        function checkOrientation() {
-            const warning = document.getElementById('orientation-warning');
-            const isPortrait = window.innerHeight > window.innerWidth;
-            
-            if (isPortrait) {
-                warning.style.display = 'flex';
-            } else {
-                warning.style.display = 'none';
-            }
-        }
-    </script>
 </body>
 </html>
