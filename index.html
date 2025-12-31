@@ -2,612 +2,153 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>🔥 معركة البقاء | Battle Royale</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>GROS - معركة البقاء</title>
     
-    <!-- المكتبات الأساسية -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.19.0/dist/cannon-es.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    <!-- أيقونة التطبيق -->
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="apple-touch-icon" href="assets/images/logo.png">
     
-    <!-- أيقونات -->
+    <!-- الخطوط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- تحسين الأداء -->
+    <!-- الأنيميشن -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
     <style>
+        /* التحميل الأولي السريع */
         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         body {
-            margin: 0;
-            padding: 0;
-            overscroll-behavior: none;
-            touch-action: none;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Cairo', sans-serif;
+            background: #000;
+            position: fixed;
+            touch-action: manipulation;
         }
         
-        canvas {
-            display: block;
-            outline: none;
+        #game-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        /* إخفاء الشاشات في البداية */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        
+        /* تأثير التحكم بالاتجاه */
+        @media screen and (orientation: portrait) {
+            .orientation-warning {
+                display: flex !important;
+            }
+        }
+        
+        @media screen and (orientation: landscape) {
+            .orientation-warning {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- شاشة التحميل السريع -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-content">
-            <div class="loader">
-                <div class="loader-inner"></div>
-            </div>
-            <div class="loading-text">
-                <h2>جاري تحميل المعركة...</h2>
-                <div class="loading-bar">
-                    <div class="loading-progress" id="loading-progress"></div>
-                </div>
-                <p id="loading-status">جاري تهيئة الخريطة...</p>
-                <div class="loading-tips">
-                    <p><i class="fas fa-lightbulb"></i> نصائح: استخدم زر الجري للهروب السريع!</p>
-                </div>
-            </div>
+    <!-- تحذير الاتجاه -->
+    <div id="orientation-warning" class="orientation-warning" style="display: none;">
+        <div class="warning-content">
+            <i class="fas fa-mobile-alt fa-4x"></i>
+            <h2>الرجاء تدوير الهاتف</h2>
+            <p>اللعبة تعمل في وضع أفقي فقط</p>
+            <div class="phone-rotate"></div>
         </div>
     </div>
-
-    <!-- شاشة اللوبي -->
-    <div id="lobby-screen" class="screen" style="display: none;">
-        <div class="lobby-container">
-            <!-- الخلفية المتحركة -->
-            <div class="lobby-background">
-                <div class="parallax-bg"></div>
-                <div class="floating-island"></div>
-                <div class="airplane"></div>
-            </div>
-            
-            <!-- المحتوى الرئيسي -->
-            <div class="lobby-content">
-                <div class="lobby-header">
-                    <h1 class="game-title">
-                        <span class="title-fire">🔥</span>
-                        معركة البقاء
-                        <span class="title-fire">🔥</span>
-                    </h1>
-                    <p class="game-subtitle">أنت ضد 19 بوت - كن الأخير على قيد الحياة!</p>
-                </div>
-                
-                <!-- منطقة اللاعبين -->
-                <div class="players-section">
-                    <h3><i class="fas fa-users"></i> اللاعبين الجاهزين</h3>
-                    <div class="players-grid" id="players-grid">
-                        <!-- اللاعبون سيتم إضافتهم هنا -->
-                    </div>
-                    <div class="players-count">
-                        <span id="players-ready">1</span>/20 لاعب جاهز
-                    </div>
-                </div>
-                
-                <!-- إعدادات اللعبة -->
-                <div class="game-settings">
-                    <div class="setting-card">
-                        <h4><i class="fas fa-map"></i> الخريطة</h4>
-                        <div class="map-selector">
-                            <div class="map-option active" data-map="island">
-                                <div class="map-preview island-preview"></div>
-                                <span>جزيرة المعركة</span>
-                            </div>
-                            <div class="map-option" data-map="desert">
-                                <div class="map-preview desert-preview"></div>
-                                <span>صحراء الغروب</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="setting-card">
-                        <h4><i class="fas fa-cog"></i> الصعوبة</h4>
-                        <div class="difficulty-selector">
-                            <button class="diff-btn active" data-diff="easy">سهل</button>
-                            <button class="diff-btn" data-diff="medium">متوسط</button>
-                            <button class="diff-btn" data-diff="hard">صعب</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- أزرار التحكم -->
-                <div class="lobby-controls">
-                    <button id="ready-btn" class="lobby-btn ready-btn">
-                        <i class="fas fa-check-circle"></i>
-                        <span>جاهز للقتال!</span>
-                    </button>
-                    
-                    <button id="start-game-btn" class="lobby-btn start-btn" disabled>
-                        <i class="fas fa-play"></i>
-                        <span>بدء المعركة (20/1)</span>
-                    </button>
-                    
-                    <button id="practice-btn" class="lobby-btn practice-btn">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>تدريب سولو</span>
-                    </button>
-                    
-                    <button id="settings-btn" class="lobby-btn settings-btn">
-                        <i class="fas fa-sliders-h"></i>
-                        <span>الإعدادات</span>
-                    </button>
-                </div>
-                
-                <!-- شريط التجهيز -->
-                <div class="countdown-section" id="countdown-section" style="display: none;">
-                    <div class="countdown-box">
-                        <h3>المعركة ستبدأ خلال:</h3>
-                        <div class="countdown-timer" id="countdown-timer">15</div>
-                        <p class="countdown-text">استعد للقفز من الطائرة!</p>
-                        <div class="countdown-progress">
-                            <div class="countdown-bar" id="countdown-bar"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- لوحة التحكم للهاتف -->
-                <div class="mobile-controls-preview">
-                    <h4><i class="fas fa-mobile-alt"></i> التحكم على الهاتف:</h4>
-                    <div class="controls-demo">
-                        <div class="control-item">
-                            <div class="control-icon"><i class="fas fa-arrows-alt"></i></div>
-                            <span>جويستيك للحركة</span>
-                        </div>
-                        <div class="control-item">
-                            <div class="control-icon"><i class="fas fa-crosshairs"></i></div>
-                            <span>سحب للدوران</span>
-                        </div>
-                        <div class="control-item">
-                            <div class="control-icon"><i class="fas fa-hand-pointer"></i></div>
-                            <span>أزرار للرمي</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- معلومات السيرفر -->
-            <div class="server-info">
-                <div class="server-status">
-                    <span class="status-indicator active"></span>
-                    <span>السيرفر: جاهز</span>
-                </div>
-                <div class="ping-display">
-                    <i class="fas fa-signal"></i>
-                    <span id="ping-value">15ms</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- شاشة الطائرة (قبل القفز) -->
-    <div id="plane-screen" class="screen" style="display: none;">
-        <div class="plane-container">
-            <div class="plane-view">
-                <div class="plane-hud">
-                    <h2>✈️ على متن الطائرة ✈️</h2>
-                    <p class="plane-instruction">اسحب لاختيار موقع الهبوط</p>
-                    
-                    <div class="map-minimap" id="plane-minimap">
-                        <!-- سيتم عرض الخريطة المصغرة هنا -->
-                    </div>
-                    
-                    <div class="jump-info">
-                        <div class="jump-timer">
-                            <i class="fas fa-clock"></i>
-                            <span>الوقت للقفز: <span id="jump-timer">30</span> ثانية</span>
-                        </div>
-                        <div class="jump-position">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>موقعك: <span id="player-position">غير محدد</span></span>
-                        </div>
-                    </div>
-                    
-                    <button id="auto-jump-btn" class="jump-btn">
-                        <i class="fas fa-parachute-box"></i>
-                        قفز تلقائي
-                    </button>
-                    
-                    <button id="manual-jump-btn" class="jump-btn primary">
-                        <i class="fas fa-sign-out-alt"></i>
-                        قفز يدوي
-                    </button>
-                </div>
-            </div>
-            
-            <div class="passengers-list">
-                <h3><i class="fas fa-user-friends"></i> اللاعبون على الطائرة</h3>
-                <div class="passengers-grid" id="passengers-list">
-                    <!-- قائمة اللاعبين -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- شاشة اللعبة الرئيسية -->
-    <div id="game-screen" class="screen" style="display: none;">
-        <canvas id="game-canvas"></canvas>
-        
-        <!-- واجهة اللعبة -->
-        <div class="game-ui">
-            <!-- شريط المعلومات العلوي -->
-            <div class="top-bar">
-                <div class="game-info">
-                    <div class="info-item players-left">
-                        <i class="fas fa-user"></i>
-                        <span id="ui-players-left">20</span>
-                    </div>
-                    <div class="info-item zone-timer">
-                        <i class="fas fa-compress-arrows-alt"></i>
-                        <span id="ui-zone-timer">02:30</span>
-                    </div>
-                    <div class="info-item game-timer">
-                        <i class="fas fa-clock"></i>
-                        <span id="ui-game-timer">05:00</span>
-                    </div>
-                </div>
-                
-                <div class="player-stats">
-                    <div class="stat-item kills">
-                        <i class="fas fa-skull-crossbones"></i>
-                        <span id="ui-kills">0</span>
-                    </div>
-                    <div class="stat-item rank">
-                        <i class="fas fa-trophy"></i>
-                        <span id="ui-rank">#20</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- شريط الصحة والدرع -->
-            <div class="health-armor-bar">
-                <div class="health-container">
-                    <div class="health-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <div class="health-bar">
-                        <div class="health-fill" id="health-fill"></div>
-                        <span class="health-text" id="health-text">100</span>
-                    </div>
-                </div>
-                
-                <div class="armor-container">
-                    <div class="armor-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="armor-bar">
-                        <div class="armor-fill" id="armor-fill"></div>
-                        <span class="armor-text" id="armor-text">0</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- معلومات السلاح -->
-            <div class="weapon-info">
-                <div class="weapon-name" id="weapon-name">-</div>
-                <div class="ammo-count" id="ammo-count">-/-</div>
-                <div class="fire-mode" id="fire-mode">auto</div>
-            </div>
-            
-            <!-- الخريطة المصغرة -->
-            <div class="mini-map-container">
-                <div class="mini-map" id="mini-map">
-                    <canvas id="mini-map-canvas"></canvas>
-                </div>
-                <div class="map-zoom">
-                    <button class="zoom-btn" id="zoom-in">+</button>
-                    <button class="zoom-btn" id="zoom-out">-</button>
-                </div>
-            </div>
-            
-            <!-- منطقة المنطقة الآمنة -->
-            <div class="safe-zone-info">
-                <div class="zone-indicator">
-                    <i class="fas fa-circle"></i>
-                    <span>المنطقة الآمنة</span>
-                </div>
-                <div class="zone-distance" id="zone-distance">0m</div>
-                <div class="zone-timer" id="zone-next-timer">02:30</div>
-            </div>
-            
-            <!-- إشعارات سريعة -->
-            <div class="notifications" id="notifications">
-                <!-- الإشعارات ستظهر هنا -->
-            </div>
-            
-            <!-- عناصر تفاعلية -->
-            <div class="interaction-prompt" id="interaction-prompt" style="display: none;">
-                <i class="fas fa-hand-point-up"></i>
-                <span id="interaction-text">اضغط لفتح</span>
-            </div>
-            
-            <!-- أزرار الهاتف -->
-            <div class="mobile-controls">
-                <!-- جويستيك الحركة -->
-                <div class="movement-joystick" id="movement-joystick">
-                    <div class="joystick-base"></div>
-                    <div class="joystick-thumb" id="joystick-thumb"></div>
-                </div>
-                
-                <!-- أزرار الحركة -->
-                <div class="mobile-buttons left-buttons">
-                    <button class="mobile-btn jump-btn" id="mobile-jump">
-                        <i class="fas fa-arrow-up"></i>
-                    </button>
-                    <button class="mobile-btn crouch-btn" id="mobile-crouch">
-                        <i class="fas fa-arrow-down"></i>
-                    </button>
-                </div>
-                
-                <!-- أزرار الرمي -->
-                <div class="mobile-buttons right-buttons">
-                    <button class="mobile-btn fire-btn" id="mobile-fire">
-                        <i class="fas fa-crosshairs"></i>
-                    </button>
-                    <button class="mobile-btn aim-btn" id="mobile-aim">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="mobile-btn reload-btn" id="mobile-reload">
-                        <i class="fas fa-redo"></i>
-                    </button>
-                </div>
-                
-                <!-- أزرار تبديل السلاح -->
-                <div class="weapon-switch">
-                    <button class="weapon-btn" data-weapon="1">1</button>
-                    <button class="weapon-btn" data-weapon="2">2</button>
-                    <button class="weapon-btn" data-weapon="3">3</button>
-                    <button class="weapon-btn" data-weapon="4">4</button>
-                </div>
-            </div>
-            
-            <!-- زر القائمة -->
-            <button class="menu-btn" id="game-menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
+    
+    <div id="game-container">
+        <!-- شاشة التحميل -->
+        <div id="loading-screen" class="screen active">
+            <!-- سيتم إنشاؤها بالكامل بالجافاسكريبت -->
         </div>
         
-        <!-- قائمة اللعبة -->
-        <div class="game-menu" id="game-menu" style="display: none;">
-            <div class="menu-content">
-                <h2><i class="fas fa-gamepad"></i> قائمة اللعبة</h2>
-                
-                <div class="menu-section">
-                    <h3>الإعدادات</h3>
-                    <div class="menu-item">
-                        <span>حساسية الماوس</span>
-                        <input type="range" id="sensitivity-slider" min="1" max="10" value="5">
-                    </div>
-                    <div class="menu-item">
-                        <span>جودة الرسومات</span>
-                        <select id="graphics-quality">
-                            <option value="low">منخفضة</option>
-                            <option value="medium" selected>متوسطة</option>
-                            <option value="high">عالية</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="menu-section">
-                    <h3>التحكم</h3>
-                    <div class="control-preset">
-                        <button class="preset-btn active" data-preset="pc">كمبيوتر</button>
-                        <button class="preset-btn" data-preset="mobile">هاتف</button>
-                        <button class="preset-btn" data-preset="gamepad">جويستيك</button>
-                    </div>
-                </div>
-                
-                <div class="menu-actions">
-                    <button class="menu-action-btn continue-btn" id="continue-btn">
-                        <i class="fas fa-play"></i> متابعة اللعب
-                    </button>
-                    <button class="menu-action-btn restart-btn" id="restart-btn">
-                        <i class="fas fa-redo"></i> إعادة بدء
-                    </button>
-                    <button class="menu-action-btn quit-btn" id="quit-btn">
-                        <i class="fas fa-sign-out-alt"></i> مغادرة اللعبة
-                    </button>
-                </div>
-                
-                <div class="menu-stats">
-                    <h3>إحصائيات المعركة</h3>
-                    <div class="stats-grid">
-                        <div class="stat">
-                            <span class="stat-label">القتلى</span>
-                            <span class="stat-value" id="menu-kills">0</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-label">الباقون</span>
-                            <span class="stat-value" id="menu-players-left">20</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-label">الوقت</span>
-                            <span class="stat-value" id="menu-time">00:00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- شاشة اللوبي -->
+        <div id="lobby-screen" class="screen"></div>
+        
+        <!-- شاشة اللعبة -->
+        <div id="game-screen" class="screen">
+            <canvas id="game-canvas"></canvas>
         </div>
+        
+        <!-- شاشة النتائج -->
+        <div id="results-screen" class="screen"></div>
     </div>
-
-    <!-- شاشة النتائج -->
-    <div id="results-screen" class="screen" style="display: none;">
-        <div class="results-container">
-            <div class="results-header" id="results-header">
-                <!-- سيتم تعبئتها بالجافاسكريبت -->
-            </div>
-            
-            <div class="results-content">
-                <div class="rank-section">
-                    <div class="rank-badge" id="rank-badge">
-                        <!-- الشارة ستظهر هنا -->
-                    </div>
-                    <h2 class="rank-title" id="rank-title"></h2>
-                    <div class="rank-position" id="rank-position"></div>
-                </div>
-                
-                <div class="stats-section">
-                    <h3><i class="fas fa-chart-line"></i> إحصائياتك</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-skull"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-label">عدد القتلى</span>
-                                <span class="stat-value" id="stat-kills">0</span>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-label">أقصى ضرر</span>
-                                <span class="stat-value" id="stat-damage">0</span>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-walking"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-label">المسافة</span>
-                                <span class="stat-value" id="stat-distance">0m</span>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-label">مدة البقاء</span>
-                                <span class="stat-value" id="stat-survival">0:00</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="rewards-section">
-                    <h3><i class="fas fa-award"></i> المكافآت</h3>
-                    <div class="rewards-grid" id="rewards-grid">
-                        <!-- المكافآت ستظهر هنا -->
-                    </div>
-                </div>
-                
-                <div class="leaderboard-section">
-                    <h3><i class="fas fa-crown"></i> أفضل اللاعبين</h3>
-                    <div class="leaderboard" id="leaderboard">
-                        <!-- لوحة الصدارة -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="results-actions">
-                <button class="results-btn play-again-btn" id="play-again-btn">
-                    <i class="fas fa-redo"></i> لعب مرة أخرى
-                </button>
-                <button class="results-btn lobby-btn" id="back-to-lobby-btn">
-                    <i class="fas fa-home"></i> العودة للوبي
-                </button>
-                <button class="results-btn share-btn" id="share-results-btn">
-                    <i class="fas fa-share-alt"></i> مشاركة النتيجة
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- نهاية الملف -->
+    
+    <!-- المكتبات -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.19.0/dist/cannon-es.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    
+    <!-- ملفات المشروع -->
+    <script src="utils/device.js"></script>
+    <script src="utils/loader.js"></script>
+    <script src="screens/loading-screen.js"></script>
+    <script src="screens/lobby-screen.js"></script>
+    <script src="game.js"></script>
+    
     <script>
-        // كشف الجهاز وتحديد نوع التحكم
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        const isTablet = /iPad|Android(?!.*Mobile)|Tablet/i.test(navigator.userAgent);
+        // بدء اللعبة بعد تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            // كشف الجهاز
+            const device = detectDevice();
+            
+            // التحقق من الاتجاه
+            checkOrientation();
+            window.addEventListener('orientationchange', checkOrientation);
+            window.addEventListener('resize', checkOrientation);
+            
+            // بدء شاشة التحميل
+            if (device.isMobile) {
+                initLoadingScreen();
+            } else {
+                alert('اللعبة مصممة للهاتف. الرجاء الفتح على جهاز محمول.');
+                // يمكن توجيه لصفحة بديلة
+            }
+        });
         
-        // حفظ إعدادات المستخدم
-        const userSettings = {
-            controls: isMobile ? 'mobile' : 'pc',
-            sensitivity: 5,
-            graphics: 'medium',
-            sound: true,
-            music: true
-        };
-        
-        // تحميل الإعدادات من التخزين المحلي
-        function loadSettings() {
-            const saved = localStorage.getItem('battleRoyaleSettings');
-            if (saved) {
-                Object.assign(userSettings, JSON.parse(saved));
+        // التحقق من الاتجاه
+        function checkOrientation() {
+            const warning = document.getElementById('orientation-warning');
+            const isPortrait = window.innerHeight > window.innerWidth;
+            
+            if (isPortrait) {
+                warning.style.display = 'flex';
+            } else {
+                warning.style.display = 'none';
             }
         }
-        
-        // حفظ الإعدادات
-        function saveSettings() {
-            localStorage.setItem('battleRoyaleSettings', JSON.stringify(userSettings));
-        }
-        
-        // تحميل الإعدادات عند البدء
-        loadSettings();
-    </script>
-    
-    <!-- تحميل الملفات -->
-    <script src="game.js"></script>
-    <script src="bot-manager.js"></script>
-    <script src="weapons.js"></script>
-    <script src="lobby.js"></script>
-    <script src="mobile-controls.js"></script>
-    
-    <!-- بدء التحميل -->
-    <script>
-        // تحميل سريع للعبة
-        document.addEventListener('DOMContentLoaded', function() {
-            // إخفاء الشاشات غير المستخدمة
-            const screens = ['lobby-screen', 'plane-screen', 'game-screen', 'results-screen'];
-            screens.forEach(screen => {
-                document.getElementById(screen).style.display = 'none';
-            });
-            
-            // بدء التحميل
-            setTimeout(() => {
-                const loadingScreen = document.getElementById('loading-screen');
-                const progressBar = document.getElementById('loading-progress');
-                const statusText = document.getElementById('loading-status');
-                
-                // محاكاة التحميل
-                let progress = 0;
-                const steps = [
-                    'جاري تهيئة الخريطة...',
-                    'تحميل النماذج ثلاثية الأبعاد...',
-                    'إعداد نظام الأسلحة...',
-                    'تحميل البوتات...',
-                    'تهيئة الفيزياء...',
-                    'جاري الإنهاء...'
-                ];
-                
-                const interval = setInterval(() => {
-                    progress += 20;
-                    progressBar.style.width = progress + '%';
-                    
-                    if (progress <= 100) {
-                        const stepIndex = Math.floor(progress / 20);
-                        if (stepIndex < steps.length) {
-                            statusText.textContent = steps[stepIndex];
-                        }
-                    }
-                    
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        loadingScreen.style.opacity = '0';
-                        
-                        setTimeout(() => {
-                            loadingScreen.style.display = 'none';
-                            document.getElementById('lobby-screen').style.display = 'block';
-                            
-                            // بدء الموسيقى
-                            if (userSettings.music) {
-                                // يمكن إضافة موسيقى خلفية هنا
-                            }
-                        }, 500);
-                    }
-                }, 200);
-            }, 100);
-        });
     </script>
 </body>
 </html>
