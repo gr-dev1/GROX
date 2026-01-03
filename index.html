@@ -2,321 +2,334 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>One Royal - لعبة البقاء الجديدة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GROS - معركة البقاء</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- شاشة التحميل -->
-    <div id="loadingScreen" class="screen">
-        <div class="loading-container">
-            <div class="logo">
-                <h1><span class="logo-accent">ONE</span> ROYAL</h1>
-                <p>لعبة البقاء من نوع جديد</p>
-            </div>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
-            <div class="loading-text">جاري تحميل اللعبة...</div>
-        </div>
-    </div>
-
-    <!-- شاشة القائمة الرئيسية -->
-    <div id="mainMenu" class="screen hidden">
-        <div class="menu-container">
-            <div class="logo">
-                <h1><span class="logo-accent">ONE</span> ROYAL</h1>
-                <p>20 لاعب | 19 بوت | خريطة 4x4</p>
+    <div class="game-container">
+        <!-- شاشة البداية -->
+        <div id="start-screen" class="screen">
+            <div class="title-container">
+                <h1 class="game-title">GROS</h1>
+                <p class="game-subtitle">معركة البقاء النهائية</p>
+                <div class="title-animation">
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                    <div class="circle"></div>
+                </div>
             </div>
             
-            <div class="menu-buttons">
-                <button id="playButton" class="menu-btn play-btn">
+            <div class="menu-options">
+                <button id="start-btn" class="menu-btn">
                     <i class="fas fa-play"></i> بدء اللعبة
                 </button>
-                <button id="customizeButton" class="menu-btn">
-                    <i class="fas fa-user"></i> تخصيص الشخصية
+                <button id="multiplayer-btn" class="menu-btn">
+                    <i class="fas fa-users"></i> اللعب الجماعي
                 </button>
-                <button id="settingsButton" class="menu-btn">
+                <button id="how-to-play-btn" class="menu-btn">
+                    <i class="fas fa-question-circle"></i> كيفية اللعب
+                </button>
+                <button id="settings-btn" class="menu-btn">
                     <i class="fas fa-cog"></i> الإعدادات
-                </button>
-                <button id="shopButton" class="menu-btn">
-                    <i class="fas fa-shopping-cart"></i> المتجر
-                </button>
-                <button id="leaderboardButton" class="menu-btn">
-                    <i class="fas fa-trophy"></i> المتصدرين
                 </button>
             </div>
             
             <div class="player-stats">
                 <div class="stat">
                     <span class="stat-label">المستوى</span>
-                    <span class="stat-value">15</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">النقاط</span>
-                    <span class="stat-value">2,450</span>
+                    <span class="stat-value">1</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">الانتصارات</span>
-                    <span class="stat-value">12</span>
+                    <span class="stat-value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">القتلى</span>
+                    <span class="stat-value">0</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- شاشة البحث عن مباراة -->
-    <div id="matchmakingScreen" class="screen hidden">
-        <div class="matchmaking-container">
-            <div class="logo small">
-                <h2><span class="logo-accent">ONE</span> ROYAL</h2>
-            </div>
-            
-            <div class="matchmaking-content">
-                <div class="searching-animation">
-                    <div class="searching-dots">
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
+        <!-- شاشة اللعبة -->
+        <div id="game-screen" class="screen hidden">
+            <div class="game-header">
+                <div class="game-info">
+                    <div class="players-remaining">
+                        <i class="fas fa-user-friends"></i>
+                        <span id="players-count">99</span> / 100
                     </div>
-                    <h3>جاري البحث عن مباراة</h3>
-                    <p>يجمع اللاعبين والبيوت...</p>
+                    <div class="game-timer">
+                        <i class="fas fa-clock"></i>
+                        <span id="game-time">05:00</span>
+                    </div>
+                    <div class="safe-zone">
+                        <i class="fas fa-shield-alt"></i>
+                        <span id="zone-timer">02:30</span>
+                    </div>
                 </div>
                 
-                <div class="players-found">
-                    <div class="player-count">
-                        <span class="count">1</span>
-                        <span class="label">/ 20 لاعب</span>
+                <div class="player-health">
+                    <div class="health-bar-container">
+                        <div class="health-bar" id="health-bar"></div>
                     </div>
-                    <div class="player-list">
-                        <div class="player-item you">
-                            <i class="fas fa-user"></i>
-                            <span>أنت</span>
+                    <span class="health-text" id="health-text">100%</span>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <!-- الخريطة -->
+                <div class="map-container">
+                    <canvas id="game-canvas"></canvas>
+                    <!-- منطقة الآمن -->
+                    <div id="safe-zone" class="safe-zone-indicator"></div>
+                </div>
+                
+                <!-- بوصلة -->
+                <div class="compass">
+                    <div class="compass-circle">
+                        <div class="compass-north">N</div>
+                        <div class="compass-needle"></div>
+                    </div>
+                </div>
+                
+                <!-- خريطة مصغرة -->
+                <div class="mini-map">
+                    <div class="mini-map-container">
+                        <canvas id="mini-map-canvas"></canvas>
+                        <div class="player-mini-map-indicator"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-footer">
+                <!-- معلومات اللاعب -->
+                <div class="player-info">
+                    <div class="player-avatar">
+                        <div class="avatar-img" id="player-avatar">P1</div>
+                    </div>
+                    <div class="player-details">
+                        <div class="player-name" id="player-name">المحارب</div>
+                        <div class="player-level">المستوى <span>1</span></div>
+                    </div>
+                </div>
+                
+                <!-- معدات اللاعب -->
+                <div class="player-equipment">
+                    <div class="weapon-slot primary-weapon">
+                        <div class="weapon-icon">
+                            <i class="fas fa-crosshairs"></i>
                         </div>
-                        <!-- سيتم إضافة اللاعبين الآخرين عبر JavaScript -->
+                        <div class="weapon-info">
+                            <div class="weapon-name" id="primary-weapon">AK-47</div>
+                            <div class="ammo-count" id="primary-ammo">30/120</div>
+                        </div>
+                    </div>
+                    
+                    <div class="weapon-slot secondary-weapon">
+                        <div class="weapon-icon">
+                            <i class="fas fa-hand-rock"></i>
+                        </div>
+                        <div class="weapon-info">
+                            <div class="weapon-name" id="secondary-weapon">مسدس</div>
+                            <div class="ammo-count" id="secondary-ammo">12/36</div>
+                        </div>
+                    </div>
+                    
+                    <div class="inventory">
+                        <div class="inventory-item">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>علاج</span>
+                        </div>
+                        <div class="inventory-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>درع</span>
+                        </div>
+                        <div class="inventory-item">
+                            <i class="fas fa-bomb"></i>
+                            <span>قنبلة</span>
+                        </div>
                     </div>
                 </div>
                 
-                <button id="cancelMatchmaking" class="cancel-btn">
-                    <i class="fas fa-times"></i> إلغاء البحث
-                </button>
+                <!-- التحكم -->
+                <div class="game-controls">
+                    <button id="shoot-btn" class="control-btn shoot-btn">
+                        <i class="fas fa-bullseye"></i>
+                    </button>
+                    <button id="reload-btn" class="control-btn reload-btn">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                    <button id="jump-btn" class="control-btn jump-btn">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                    <button id="crouch-btn" class="control-btn crouch-btn">
+                        <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- لوحة النتائج -->
+        <div id="score-screen" class="screen hidden">
+            <div class="score-container">
+                <h2 class="score-title">نتيجة اللعبة</h2>
+                <div class="score-result">
+                    <div class="result-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="result-text">
+                        <h3>المركز: <span id="player-rank">1</span></h3>
+                        <p class="kills-count">عدد القتلى: <span id="final-kills">12</span></p>
+                        <p class="damage-dealt">إجمالي الضرر: <span id="total-damage">2450</span></p>
+                        <p class="survival-time">وقت البقاء: <span id="survival-time">04:32</span></p>
+                    </div>
+                </div>
+                
+                <div class="score-actions">
+                    <button id="play-again-btn" class="score-btn">
+                        <i class="fas fa-redo"></i> لعب مرة أخرى
+                    </button>
+                    <button id="back-to-menu-btn" class="score-btn">
+                        <i class="fas fa-home"></i> القائمة الرئيسية
+                    </button>
+                </div>
+                
+                <div class="leaderboard">
+                    <h3>أفضل اللاعبين</h3>
+                    <div class="leaderboard-list">
+                        <div class="leaderboard-item">
+                            <span class="rank">1</span>
+                            <span class="player">المحارب</span>
+                            <span class="score">12 قتل</span>
+                        </div>
+                        <div class="leaderboard-item">
+                            <span class="rank">2</span>
+                            <span class="player">الصياد</span>
+                            <span class="score">10 قتل</span>
+                        </div>
+                        <div class="leaderboard-item">
+                            <span class="rank">3</span>
+                            <span class="player">النمر</span>
+                            <span class="score">8 قتل</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- شاشة اللعبة -->
-    <div id="gameScreen" class="screen hidden">
-        <!-- عناصر واجهة اللعبة -->
-        <div class="game-hud">
-            <!-- معلومات اللاعب -->
-            <div class="player-info">
-                <div class="health-bar">
-                    <div class="health-fill" style="width: 100%"></div>
-                    <span class="health-text">100</span>
+    <!-- لوحة الإعدادات -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2><i class="fas fa-cog"></i> الإعدادات</h2>
+            <div class="settings-section">
+                <h3>الصوت</h3>
+                <div class="setting">
+                    <label>الموسيقى</label>
+                    <input type="range" id="music-volume" min="0" max="100" value="70">
                 </div>
-                <div class="armor-bar">
-                    <div class="armor-fill" style="width: 75%"></div>
-                    <span class="armor-text">75</span>
-                </div>
-                <div class="ammo-count">
-                    <i class="fas fa-bullseye"></i>
-                    <span>30 / 90</span>
+                <div class="setting">
+                    <label>الأصوات</label>
+                    <input type="range" id="sfx-volume" min="0" max="100" value="80">
                 </div>
             </div>
             
-            <!-- معلومات الخريطة واللاعبين -->
-            <div class="game-info">
-                <div class="map-info">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>المنطقة الآمنة: 2x2</span>
+            <div class="settings-section">
+                <h3>التحكم</h3>
+                <div class="setting">
+                    <label>حساسية الماوس</label>
+                    <input type="range" id="mouse-sensitivity" min="1" max="10" value="5">
                 </div>
-                <div class="players-left">
-                    <i class="fas fa-users"></i>
-                    <span>لاعبين باقيين: <span id="playersRemaining">20</span></span>
-                </div>
-                <div class="timer">
-                    <i class="fas fa-clock"></i>
-                    <span>04:32</span>
+                <div class="setting">
+                    <label>عكس الماوس</label>
+                    <input type="checkbox" id="invert-mouse">
                 </div>
             </div>
             
-            <!-- معلومات الأسلحة -->
-            <div class="weapon-info">
-                <div class="weapon-slot active">
-                    <i class="fas fa-gun"></i>
-                    <span>AK-47</span>
+            <div class="settings-section">
+                <h3>الرسوميات</h3>
+                <div class="setting">
+                    <label>جودة الرسوم</label>
+                    <select id="graphics-quality">
+                        <option value="low">منخفضة</option>
+                        <option value="medium" selected>متوسطة</option>
+                        <option value="high">عالية</option>
+                    </select>
                 </div>
-                <div class="weapon-slot">
-                    <i class="fas fa-gun"></i>
-                    <span>Pistol</span>
+                <div class="setting">
+                    <label>إظهار التأثيرات</label>
+                    <input type="checkbox" id="show-effects" checked>
                 </div>
-                <div class="weapon-slot">
-                    <i class="fas fa-first-aid"></i>
-                    <span>علبة إسعاف</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- عناصر تحكم اللمس -->
-        <div class="touch-controls">
-            <!-- جويستيك للحركة -->
-            <div class="joystick-area" id="movementJoystick">
-                <div class="joystick-base"></div>
-                <div class="joystick-handle"></div>
             </div>
             
-            <!-- أزرار التحكم -->
-            <div class="action-buttons">
-                <button class="action-btn jump-btn" id="jumpBtn">
-                    <i class="fas fa-arrow-up"></i>
-                </button>
-                <button class="action-btn crouch-btn" id="crouchBtn">
-                    <i class="fas fa-arrow-down"></i>
-                </button>
-                <button class="action-btn reload-btn" id="reloadBtn">
-                    <i class="fas fa-redo"></i>
-                </button>
-                <button class="action-btn shoot-btn" id="shootBtn">
-                    <i class="fas fa-crosshairs"></i>
-                </button>
-                <button class="action-btn inventory-btn" id="inventoryBtn">
-                    <i class="fas fa-briefcase"></i>
-                </button>
-            </div>
-            
-            <!-- جويستيك للكاميرا -->
-            <div class="camera-joystick-area" id="cameraJoystick">
-                <div class="joystick-base"></div>
-                <div class="joystick-handle"></div>
-            </div>
-        </div>
-        
-        <!-- قائمة الجرد -->
-        <div id="inventoryMenu" class="inventory hidden">
-            <div class="inventory-header">
-                <h3>الجرد</h3>
-                <button class="close-inventory" id="closeInventory">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="inventory-items">
-                <!-- سيتم ملئها عبر JavaScript -->
+            <div class="modal-actions">
+                <button id="save-settings" class="modal-btn">حفظ</button>
+                <button id="close-settings" class="modal-btn">إغلاق</button>
             </div>
         </div>
     </div>
 
-    <!-- شاشة النتائج -->
-    <div id="resultsScreen" class="screen hidden">
-        <div class="results-container">
-            <div class="results-header">
-                <h2 id="resultTitle">#1 VICTORY ROYALE!</h2>
-                <p class="result-subtitle">لقد فزت في المباراة!</p>
-            </div>
-            
-            <div class="results-stats">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-skull-crossbones"></i>
+    <!-- كيف تلعب -->
+    <div id="how-to-play-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2><i class="fas fa-question-circle"></i> كيفية اللعب</h2>
+            <div class="instructions">
+                <div class="instruction">
+                    <div class="instruction-icon">
+                        <i class="fas fa-running"></i>
                     </div>
-                    <div class="stat-content">
-                        <span class="stat-value" id="killsStat">5</span>
-                        <span class="stat-label">عدد القتلى</span>
+                    <div class="instruction-text">
+                        <h3>الحركة</h3>
+                        <p>استخدم مفاتيح WASD للتحرك في جميع الاتجاهات</p>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
+                <div class="instruction">
+                    <div class="instruction-icon">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </div>
+                    <div class="instruction-text">
+                        <h3>التصويب</h3>
+                        <p>حرك الماوس لتوجيه السلاح وانقر للاطلاق</p>
+                    </div>
+                </div>
+                <div class="instruction">
+                    <div class="instruction-icon">
+                        <i class="fas fa-compress-arrows-alt"></i>
+                    </div>
+                    <div class="instruction-text">
+                        <h3>التحكم</h3>
+                        <p>اضغط على المسافة للقفز، وزر CTRL للانبطاح</p>
+                    </div>
+                </div>
+                <div class="instruction">
+                    <div class="instruction-icon">
                         <i class="fas fa-map-marked-alt"></i>
                     </div>
-                    <div class="stat-content">
-                        <span class="stat-value" id="damageStat">1,240</span>
-                        <span class="stat-label">الضرر الكلي</span>
+                    <div class="instruction-text">
+                        <h3>منطقة الآمن</h3>
+                        <p>ابق داخل المنطقة الآمنة لتجنب الضرر</p>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
+                <div class="instruction">
+                    <div class="instruction-icon">
+                        <i class="fas fa-medkit"></i>
                     </div>
-                    <div class="stat-content">
-                        <span class="stat-value" id="timeStat">08:42</span>
-                        <span class="stat-label">مدة البقاء</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-medal"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-value" id="xpStat">+450</span>
-                        <span class="stat-label">نقاط الخبرة</span>
+                    <div class="instruction-text">
+                        <h3>البقاء على قيد الحياة</h3>
+                        <p>اجمع الأسلحة والمعدات الطبية لتبقى حياً</p>
                     </div>
                 </div>
             </div>
-            
-            <div class="results-buttons">
-                <button id="playAgainButton" class="results-btn play-again-btn">
-                    <i class="fas fa-redo"></i> لعب مرة أخرى
-                </button>
-                <button id="mainMenuButton" class="results-btn menu-btn">
-                    <i class="fas fa-home"></i> القائمة الرئيسية
-                </button>
-            </div>
+            <button id="close-instructions" class="modal-btn">حسناً</button>
         </div>
     </div>
 
-    <!-- إعدادات اللعبة -->
-    <div id="settingsMenu" class="settings hidden">
-        <div class="settings-header">
-            <h3><i class="fas fa-cog"></i> إعدادات اللعبة</h3>
-            <button class="close-settings" id="closeSettings">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="settings-content">
-            <div class="setting-item">
-                <label for="soundVolume">مستوى الصوت</label>
-                <input type="range" id="soundVolume" min="0" max="100" value="70">
-                <span class="volume-value">70%</span>
-            </div>
-            <div class="setting-item">
-                <label for="sensitivity">حساسية التحكم</label>
-                <input type="range" id="sensitivity" min="1" max="10" value="5">
-                <span class="sensitivity-value">5</span>
-            </div>
-            <div class="setting-item">
-                <label for="graphicsQuality">جودة الرسومات</label>
-                <select id="graphicsQuality">
-                    <option value="low">منخفضة</option>
-                    <option value="medium" selected>متوسطة</option>
-                    <option value="high">عالية</option>
-                </select>
-            </div>
-            <div class="setting-item">
-                <label for="controlLayout">تخطيط التحكم</label>
-                <select id="controlLayout">
-                    <option value="default" selected>افتراضي</option>
-                    <option value="left-handed">لأعسر اليد</option>
-                    <option value="custom">مخصص</option>
-                </select>
-            </div>
-            <div class="setting-item">
-                <button id="saveSettings" class="save-btn">
-                    <i class="fas fa-save"></i> حفظ الإعدادات
-                </button>
-            </div>
-        </div>
-    </div>
+    <audio id="shoot-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-gun-pistol-shot-1669.mp3"></audio>
+    <audio id="background-music" loop src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3"></audio>
 
-    <!-- رسالة تنبيه -->
-    <div id="alertMessage" class="alert hidden">
-        <div class="alert-content">
-            <p id="alertText">هذه رسالة تنبيه</p>
-        </div>
-    </div>
-
-    <!-- عنصر canvas للعرض ثلاثي الأبعاد -->
-    <canvas id="gameCanvas"></canvas>
-
-    <script src="game.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
